@@ -19,10 +19,10 @@ class Game extends Model
         return $this->belongsToMany('\appdb\models\Platform', 'game2platform', 'game_id', 'platform_id');
     }
 
-//    public function original_game_ratings() {
-//
-//        return $this->belongsToMany('\appdb\models\GameRating', 'game2rating', 'game_id', 'rating_id');
-//    }
+    public function original_game_ratings() {
+
+        return $this->belongsToMany('\appdb\models\GameRating', 'game2rating', 'game_id', 'rating_id');
+    }
 
     public function publishers() {
         return $this->belongsToMany('\appdb\models\Company', 'game_publishers', 'game_id', 'comp_id');
@@ -35,10 +35,10 @@ class Game extends Model
 //    public function themes() {
 //        return $this->belongsToMany('\appdb\models\Theme', 'game2theme', 'game_id','theme_id');
 //    }
-//
-//    public function genres() {
-//        return $this->belongsToMany('\appdb\models\Genre', 'game2genre', 'game_id','genre_id');
-//    }
+
+    public function genres() {
+        return $this->belongsToMany('\appdb\models\Genre', 'game2genre', 'game_id','genre_id');
+    }
 
     public function similar_games() {
         return $this->belongsToMany('\appdb\models\Game', 'similar_games', 'game1_id', 'game2_id');
