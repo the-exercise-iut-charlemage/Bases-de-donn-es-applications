@@ -415,7 +415,7 @@ html;
     DB::enableQueryLog();
 
 
-    // requet
+    Game::select('name')->where('id', '=', '12342')->first()->characters()->get();
 
 
     dd(DB::getQueryLog());
@@ -450,7 +450,11 @@ html;
     DB::enableQueryLog();
 
 
-    // requet
+
+    foreach (Game::select('name')->where('name', 'like', '%Mario%')->get() as $game)
+    {
+        $game->characters()->get();
+    }
 
 
     dd(DB::getQueryLog());
@@ -468,7 +472,10 @@ html;
     DB::enableQueryLog();
 
 
-    // requet
+    foreach (Company::select('name')->where('name', 'like', '%Sony%')->get() as $company)
+    {
+        $company->gameDevelops()->get();
+    }
 
 
     dd(DB::getQueryLog());
