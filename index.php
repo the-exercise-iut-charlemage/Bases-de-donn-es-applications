@@ -33,6 +33,10 @@ $app->get('/', function () {
     $url11 = $slim->urlFor('tp2-exo6');
     $url12 = $slim->urlFor('tp2-exo7');
 
+    $url13 = $slim->urlFor('tp3-exo1');
+    $url14 = $slim->urlFor('tp3-exo2');
+    $url15 = $slim->urlFor('tp3-exo3');
+    $url16 = $slim->urlFor('tp3-exo4');
     echo <<<html
 <div>
     <h1>TP 1:</h1>
@@ -42,6 +46,7 @@ $app->get('/', function () {
     <a href='$url4'>Exo4</a>
     <a href='$url5'>Exo5</a>
 </div>
+<hr>
 <div>
     <h1>TP 2:</h1>
     <a href='$url6'>Exo1</a>
@@ -52,6 +57,16 @@ $app->get('/', function () {
     <a href='$url11'>Exo6</a>
     <a href='$url12'>Exo7</a>
 </div>
+<hr>
+<div>
+    <h1>TP 3:</h1>
+    <a href='$url13'>Exo1</a>
+    <a href='$url14'>Exo2</a>
+    <a href='$url15'>Exo3</a>
+    <a href='$url16'>Exo4</a>
+</div>
+<hr>
+
 html;
 })->name('home');
 
@@ -186,7 +201,7 @@ $app->get('/tp2/exo3', function () {
     $url1 = $slim->urlFor('home');
     $html = <<<html
 <a href='$url1'>Home</a>
-TP2-Exo 2<br>
+TP2-Exo 3<br>
 html;
 
     $companies = Company::where('name', 'like', '%Sony%')->get();
@@ -204,7 +219,7 @@ $app->get('/tp2/exo4', function () {
     $url1 = $slim->urlFor('home');
     echo <<<html
 <a href='$url1'>Home</a>
-TP2-Exo 2<br>
+TP2-Exo 4<br>
 html;
 
     foreach (Game::where('name', 'like', 'Mario%')->get() as $game) {
@@ -221,7 +236,7 @@ $app->get('/tp2/exo5', function () {
     $url1 = $slim->urlFor('home');
     echo <<<html
 <a href='$url1'>Home</a>
-TP2-Exo 2<br>
+TP2-Exo 5<br>
 html;
 
     foreach (Game::where('name', 'like', 'Mario%')->has('characters', '>', 3)->get() as $game) {
@@ -238,7 +253,7 @@ $app->get('/tp2/exo6', function () {
     $url1 = $slim->urlFor('home');
     echo <<<html
 <a href='$url1'>Home</a>
-TP2-Exo 2<br>
+TP2-Exo 6<br>
 html;
 
     foreach (Game::where('name', 'like', 'Mario%')
@@ -265,7 +280,7 @@ $app->get('/tp2/exo7', function () {
     $url1 = $slim->urlFor('home');
     echo <<<html
 <a href='$url1'>Home</a>
-TP2-Exo 2<br>
+TP2-Exo 7<br>
 html;
 
     $genre = new Genre();
@@ -288,5 +303,179 @@ html;
     }
 
 })->name('tp2-exo7');
+
+
+$app->get('/tp3/exo1', function () {
+    $slim = Slim::getInstance();
+    $url1 = $slim->urlFor('home');
+    echo <<<html
+<a href='$url1'>Home</a>
+TP3-Exo 1<br>
+html;
+
+    $time_start = microtime_float();
+
+    $games = Game::select('name', 'description')->get();
+
+    $time_end = microtime_float();
+    $time = $time_end - $time_start;
+
+    echo "temps d'execution: $time seconde<br>";
+})->name('tp3-exo1');
+
+function microtime_float() {
+    list($usec, $sec) = explode(" ", microtime());
+    return ((float)$usec + (float)$sec);
+}
+
+$app->get('/tp3/exo2', function () {
+    $time_start = microtime_float();
+
+    $exo1 = Game::select('name', 'description')->where('name', 'like', '%mario%')->get();
+
+    $time_end = microtime_float();
+    $time = $time_end - $time_start;
+
+    echo "temps d'execution: $time seconde<br>";
+    $slim = Slim::getInstance();
+    $url1 = $slim->urlFor('home');
+    echo <<<html
+<a href='$url1'>Home</a>
+TP3-Exo 2<br>
+html;
+})->name('tp3-exo2');
+
+$app->get('/tp3/exo3', function () {
+    $time_start = microtime_float();
+
+    $exo1 = Game::select('name', 'description')->where('name', 'like', 'mario%')->get();
+
+    $time_end = microtime_float();
+    $time = $time_end - $time_start;
+
+    echo "temps d'execution: $time seconde<br>";
+    $slim = Slim::getInstance();
+    $url1 = $slim->urlFor('home');
+    echo <<<html
+<a href='$url1'>Home</a>
+TP3-Exo 3<br>
+html;
+})->name('tp3-exo3');
+
+
+$app->get('/tp3/exo4', function () {
+    $slim = Slim::getInstance();
+    $url1 = $slim->urlFor('home');
+    echo <<<html
+<a href='$url1'>Home</a>
+TP3-Exo 4<br>
+html;
+
+    $time_start = microtime_float();
+
+    foreach (Game::where('name', 'like', 'Mario%')
+                 ->whereHas('original_game_ratings', function($q){
+                     $q->where('name', 'like', '%3+%');
+                 })->get() as $game)  {
+        foreach ($game->original_game_ratings as $rating) {
+        }
+        foreach ($game->publishers as $comp) {
+        }
+    }
+
+    $time_end = microtime_float();
+    $time = $time_end - $time_start;
+    echo "temps d'execution: $time seconde<br>";
+
+})->name('tp3-exo4');
+
+
+
+$app->get('/tp3/p2/exo1', function () {
+    $slim = Slim::getInstance();
+    $url1 = $slim->urlFor('home');
+    echo <<<html
+<a href='$url1'>Home</a>
+TP3-P2-Exo 1<br>
+html;
+    DB::enableQueryLog();
+    $exo1 = Game::select('name', 'description')->where('name', 'like', '%mario%')->get();
+    dd(DB::getQueryLog());
+})->name('tp3-p2-exo1');
+
+
+
+$app->get('/tp3/p2/exo2', function () {
+    $slim = Slim::getInstance();
+    $url1 = $slim->urlFor('home');
+    echo <<<html
+<a href='$url1'>Home</a>
+TP3-P2-Exo 2<br>
+html;
+    DB::enableQueryLog();
+
+
+    // requet
+
+
+    dd(DB::getQueryLog());
+})->name('tp3-p2-exo2');
+
+
+
+$app->get('/tp3/p2/exo3', function () {
+    $slim = Slim::getInstance();
+    $url1 = $slim->urlFor('home');
+    echo <<<html
+<a href='$url1'>Home</a>
+TP3-P2-Exo 3<br>
+html;
+    DB::enableQueryLog();
+
+
+    // requet
+
+
+    dd(DB::getQueryLog());
+})->name('tp3-p2-exo3');
+
+
+$app->get('/tp3/p2/exo4', function () {
+    $slim = Slim::getInstance();
+    $url1 = $slim->urlFor('home');
+    echo <<<html
+<a href='$url1'>Home</a>
+TP3-P2-Exo 4<br>
+html;
+    DB::enableQueryLog();
+
+
+    // requet
+
+
+    dd(DB::getQueryLog());
+})->name('tp3-p2-exo4');
+
+
+
+$app->get('/tp3/p2/exo5', function () {
+    $slim = Slim::getInstance();
+    $url1 = $slim->urlFor('home');
+    echo <<<html
+<a href='$url1'>Home</a>
+TP3-P2-Exo 5<br>
+html;
+    DB::enableQueryLog();
+
+
+    // requet
+
+
+    dd(DB::getQueryLog());
+})->name('tp3-p2-exo5');
+
+
+
+
 
 $app->run();
