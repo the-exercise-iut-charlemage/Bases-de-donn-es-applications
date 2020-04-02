@@ -1,6 +1,7 @@
 <?php
 require_once 'vendor/autoload.php';
 
+use appdb\models\Character;
 use appdb\models\Game;
 use appdb\models\Company;
 use appdb\models\Platform;
@@ -433,8 +434,10 @@ html;
     DB::enableQueryLog();
 
 
-    // requet
-
+    foreach (Game::where('name', 'like', '%Mario%')->get() as $game)
+    {
+        Character::where('first_appeared_in_game_id', '=', $game->id)->get();
+    }
 
     dd(DB::getQueryLog());
 })->name('tp3-p2-exo3');
