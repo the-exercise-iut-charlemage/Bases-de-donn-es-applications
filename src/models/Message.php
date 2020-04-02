@@ -10,8 +10,6 @@ class Message extends Model
 {
     protected $table = 'message';
     protected $primaryKey = 'id';
-    protected $fillable = ['id', 'title', 'content'];
+    protected $fillable = ['title', 'content'];
     public $timestamps = true;
-
-    
 }
