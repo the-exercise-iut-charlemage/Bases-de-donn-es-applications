@@ -13,7 +13,7 @@ class User extends Model
     protected $fillable = ['email', 'name', 'surname', 'adress', 'phone', 'birth'];
     public $timestamps = false;
 
-    public function message() {
+    public function messages() {
         return $this->belongsToMany('\appdb\models\message', 'message2user', 'idusr', 'idmsg');
     }
 }
