@@ -19,3 +19,17 @@ CREATE TABLE message
   updated_at DATE,
   PRIMARY KEY (id)
 );
+
+CREATE TABLE message2user
+(
+  idusr INT,
+  idmsg INT,
+  PRIMARY KEY (idusr,idmsg)
+);
+
+CREATE TABLE message2game
+(
+  idgame INT,
+  idmsg INT,
+  PRIMARY KEY (idgame,idmsg)
+);
