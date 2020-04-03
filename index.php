@@ -456,7 +456,7 @@ html;
 
     foreach (Game::where('name', 'like', '%Mario%')->get() as $game)
     {
-        Character::where('first_appeared_in_game_id', '=', $game->id)->get();
+        $game->first_appearance_characters()->get();
     }
 
     dd(DB::getQueryLog());
