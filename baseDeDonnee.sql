@@ -5,7 +5,7 @@ CREATE TABLE user
   name VARCHAR (15),
   surname VARCHAR (15),
   adress VARCHAR (30),
-  phone VARCHAR (10),
+  phone VARCHAR (16),
   birth DATE,
   PRIMARY KEY (id)
 );

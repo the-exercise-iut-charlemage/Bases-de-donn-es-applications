@@ -49,3 +49,30 @@ $mess6 = new Message();
 $mess6->title='bof';
 $mess6->content='rien de fou dans ce jeu';
 $mess6->save();
+
+
+$faker = Faker\Factory::create();
+for ($i=0; $i<25000; $i++) {
+    $user=new User();
+    $user->name = $faker->firstname;
+    $user->email = $faker->email;
+    $user->surname = $faker->lastName;
+    $user->adress = $faker->address;
+    $user->phone = $faker->phoneNumber;
+    $user->save();
+}
+
+for ($j=0; $j<250000; $j++){
+    $mess = new Message();
+    $mess->title=$faker->word;
+    $mess->content=$faker->text(100);
+    $mess->save();
+
+    $usr=User::where('id','=', $faker->numberBetween(1,25000));
+    $usr->messages()->attach($mess);
+    $user->save();
+    
+    $game=Game::where('id','=', $faker->numberBetween(1,47948));
+    $game->messages()->attach($mess);
+    $game->save();
+}
