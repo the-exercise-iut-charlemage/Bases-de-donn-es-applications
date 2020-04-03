@@ -52,7 +52,7 @@ class Game extends Model
         return $this->hasMany('\appdb\models\Character', 'first_appeared_in_game_id');
     }
 
-//    public function comments() {
-//        return $this->hasMany('\appdb\models\Comment', 'game_id');
-//    }
+    public function message() {
+        return $this->belongsToMany('\appdb\models\message', 'message2game', 'idgame', 'idmsg');
+    }
 }
