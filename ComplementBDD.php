@@ -68,11 +68,11 @@ for ($j=0; $j<250000; $j++){
     $mess->content=$faker->text(100);
     $mess->save();
 
-    $usr=User::where('id','=', $faker->numberBetween(1,25000));
+    $usr=User::where('id','=', $faker->numberBetween(1,25000))->get();
     $usr->messages()->attach($mess);
     $user->save();
-    
-    $game=Game::where('id','=', $faker->numberBetween(1,47948));
+
+    $game=Game::where('id','=', $faker->numberBetween(1,47948))->get();
     $game->messages()->attach($mess);
     $game->save();
 }
