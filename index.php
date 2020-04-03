@@ -5,6 +5,7 @@ use appdb\models\Character;
 use appdb\models\Game;
 use appdb\models\Company;
 use appdb\models\Platform;
+use appdb\models\User;
 use \Illuminate\Database\Capsule\Manager as DB;
 use Slim\Slim;
 use appdb\models\Genre;
@@ -38,6 +39,13 @@ $app->get('/', function () {
     $url14 = $slim->urlFor('tp3-exo2');
     $url15 = $slim->urlFor('tp3-exo3');
     $url16 = $slim->urlFor('tp3-exo4');
+
+    $url17 = $slim->urlFor('tp3-p2-exo1');
+    $url18 = $slim->urlFor('tp3-p2-exo2');
+    $url19 = $slim->urlFor('tp3-p2-exo3');
+    $url20 = $slim->urlFor('tp3-p2-exo4');
+
+    $url21 = $slim->urlFor('tp4-exo1');
     echo <<<html
 <div>
     <h1>TP 1:</h1>
@@ -60,14 +68,26 @@ $app->get('/', function () {
 </div>
 <hr>
 <div>
-    <h1>TP 3:</h1>
+    <h1>TP 3 Partie 1:</h1>
     <a href='$url13'>Exo1</a>
     <a href='$url14'>Exo2</a>
     <a href='$url15'>Exo3</a>
     <a href='$url16'>Exo4</a>
 </div>
 <hr>
-
+<div>
+    <h1>TP 3 Partie 2:</h1>
+    <a href='$url17'>Exo1</a>
+    <a href='$url18'>Exo2</a>
+    <a href='$url19'>Exo3</a>
+    <a href='$url20'>Exo4</a>
+</div>
+<hr>
+<div>
+    <h1>TP 4:</h1>
+    <a href='$url21'>Exo1</a>
+</div>
+<hr>
 html;
 })->name('home');
 
@@ -484,8 +504,35 @@ html;
     dd(DB::getQueryLog());
 })->name('tp3-p2-exo5');
 
+$app->get('/tp4/exo1', function () {
+    $slim = Slim::getInstance();
+    $url1 = $slim->urlFor('home');
+    echo <<<html
+<a href='$url1'>Home</a>
+TP3-P2-Exo 5<br><br>
+html;
 
+    $user1 = new User();
+    $user1->name = 'Robert';
+    $user1->email = 'darksasuke@gmail.com';
+    $user1->surname = 'Dupont';
+    $user1->adress = 'city';
+    $user1->phone = '0394502846';
+    $user1->save();
 
+    echo $user1 . "<hr>";
 
+    $user2 = new User();
+    $user2->name = 'Gillou';
+    $user2->email = 'XxGillouxX@gmail.com';
+    $user2->surname = 'Durand';
+    $user2->adress = 'othercity';
+    $user2->phone = '0344328948';
+    $user2->save();
+
+    echo $user2 . "<hr>";
+
+    echo "Les donnée on bien etais ajouté";
+})->name('tp4-exo1');
 
 $app->run();
