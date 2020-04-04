@@ -76,3 +76,19 @@ for ($j=0; $j<250000; $j++){
     $game->messages()->attach($mess);
     $game->save();
 }
+
+
+
+
+//ici faut rechercher les messages de la personne donnée. mais je sais pas comment faire donc je mets ca
+$id='id de la personne recherchée';
+$u = User::where('id','like',$id);
+foreach($u as $values){
+    foreach($values->messages as $m){
+        $m::select('created_at')->orderBy('created_at','desc')->get();
+    }
+}
+
+foreach(User::has('messages', '>', 5)->get()as $us){
+    $us->get();
+}
