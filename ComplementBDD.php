@@ -83,12 +83,10 @@ for ($j=0; $j<250000; $j++){
 //ici faut rechercher les messages de la personne donnée. mais je sais pas comment faire donc je mets ca
 $id='id de la personne recherchée';
 $u = User::where('id','like',$id);
-foreach($u as $values){
-    foreach($values->messages as $m){
-        $m::select('created_at')->orderBy('created_at','desc')->get();
-    }
+foreach (User::where('id', '=', $u)->first()->messages()->orderBy('created_at','desc')->get() as $m) {
+    echo $m->title . ' | ' . $m->content . ' | ' . $m->created_at . '<hr>';
 }
 
-foreach(User::has('messages', '>', 5)->get()as $us){
-    $us->get();
+foreach(User::has('messages', '>', 5)->get() as $user){
+    echo $user->name . '<hr>';
 }
