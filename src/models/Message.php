@@ -12,4 +12,8 @@ class Message extends Model
     protected $primaryKey = 'id';
     protected $fillable = ['title', 'content'];
     public $timestamps = true;
+
+    public function user() {
+        return $this->belongsToMany('\appdb\models\User', 'message2user', 'idmsg', 'idusr');
+    }
 }

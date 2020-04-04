@@ -16,7 +16,6 @@ class Character extends Model {
     ];
 
 //    public function first_appeared_in_game() {
-//
 //        return $this->belongsTo('\appdb\models\Game', 'first_appeared_in_game_id');
 //    }
 

@@ -7,6 +7,7 @@ use appdb\models\Company;
 use appdb\models\Message;
 use appdb\models\Platform;
 use appdb\models\User;
+use Faker\Factory;
 use \Illuminate\Database\Capsule\Manager as DB;
 use Slim\Slim;
 use appdb\models\Genre;
@@ -47,6 +48,7 @@ $app->get('/', function () {
     $url20 = $slim->urlFor('tp3-p2-exo4');
 
     $url21 = $slim->urlFor('tp4-exo1');
+    $url22 = $slim->urlFor('tp4-exo2');
     echo <<<html
 <div>
     <h1>TP 1:</h1>
@@ -87,6 +89,7 @@ $app->get('/', function () {
 <div>
     <h1>TP 4:</h1>
     <a href='$url21'>Exo1</a>
+    <a href='$url22'>Exo2</a>
 </div>
 <hr>
 html;
@@ -612,5 +615,289 @@ html;
 
 
 })->name('tp4-exo1');
+
+
+$app->get('/tp4/exo2', function () {
+    $slim = Slim::getInstance();
+    $url1 = $slim->urlFor('home');
+    echo <<<html
+<a href='$url1'>Home</a>
+TP3-P2-Exo 5<br><br>
+html;
+    $faker = Factory::create();
+    for ($i=0; $i<25000; $i++) {
+        $user=new User();
+        $user->name = $faker->firstname;
+        $user->email = $faker->email;
+        $user->surname = $faker->lastName;
+        $user->adress = $faker->address;
+        $user->phone = $faker->phoneNumber;
+        $user->save();
+    }
+    for ($j=0; $j<250000; $j++){
+        $mess = new Message();
+        $mess->title=$faker->word;
+        $mess->content=$faker->text(100);
+        $mess->save();
+
+        $usr=User::where('id','=', $faker->numberBetween(1,25000))->first();
+        $usr->messages()->attach($mess);
+        $usr->save();
+
+        $game=Game::where('id','=', $faker->numberBetween(1,47948))->first();
+        $game->messages()->attach($mess);
+        $game->save();
+    }
+})->name('tp4-exo2');
+
+$app->get('/tp4/exo3', function () {
+    $slim = Slim::getInstance();
+    $url1 = $slim->urlFor('home');
+    if (isset($_GET['user']))
+    {
+        $user = $_GET['user'];
+    } else {
+        $user = 1;
+    }
+    echo <<<html
+<a href='$url1'>Home</a>
+TP3-P2-Exo 5<br>
+L'utilisateur se set dans les get situé dans l'url: 
+<code>?user=$user</code>
+<br><br>
+html;
+
+    foreach (User::where('id', '=', $user)->first()->messages()->orderBy('created_at','desc')->get() as $message) {
+        echo $message->title . ' | ' . $message->content . ' | ' . $message->created_at . '<hr>';
+    }
+
+})->name('tp4-exo3');
+
+$app->get('/tp4/exo4', function () {
+    $slim = Slim::getInstance();
+    $url1 = $slim->urlFor('home');
+    echo <<<html
+<a href='$url1'>Home</a>
+TP3-P2-Exo 5<br><br>
+html;
+
+    foreach(User::has('messages', '>', 5)->get() as $user){
+        echo $user->name . '<hr>';
+    }
+
+})->name('tp4-exo4');
+
+
+
+
+/* *********************************************** *
+ *                      API                        *
+ * *********************************************** */
+
+$app->get('/api/games/:id', function ($id) {
+    $game = Game::where('id', '=', filter_var($id, FILTER_SANITIZE_STRING))->first();
+    if (isset($game->name))
+    {
+        $id = $game->id;
+        $name = trim(preg_replace('/\s+/', ' ', str_replace('"', '\"', $game->name)));
+        $alias = trim(preg_replace('/\s+/', ' ', str_replace('"', '\"', $game->alias)));
+        $deck = trim(preg_replace('/\s+/', ' ', str_replace('"', '\"', $game->deck)));
+        $description = trim(preg_replace('/\s+/', ' ', str_replace('"', '\"', $game->description)));
+        $original_release_date = $game->original_release_date;
+        header('Content-Type: application/json; charset=utf-8');
+        echo <<<json
+{
+    "game": {
+        "id": $id,
+        "name": "$name",
+        "alias": "$alias",
+        "deck": "$deck",
+        "description": "$description",
+        "original_release_date": "$original_release_date"
+    },
+    "links": {
+        "comments": "/api/games/$id/comments",
+        "characters": "/api/games/$id/characters"
+    }
+}
+json;
+        exit();
+    } else {
+        header('Content-Type: application/json; charset=utf-8');
+        header("HTTP/1.0 404 Not Found");
+        echo '{"error": "404 - Not Found"}';
+        exit();
+    }
+})->name('api-game-id');
+
+$app->get('/api/games/:id/comments', function ($id) {
+    $game = Game::where('id', '=', filter_var($id, FILTER_SANITIZE_STRING))->first();
+    if (isset($game->name))
+    {
+        $json = '{"comments": [';
+        $json_tmp = '';
+
+        $comments = $game->messages;
+
+        foreach ($comments as $comment)
+        {
+            $id = $comment->id;
+            $user = User::whereHas('messages', function($q) use ($id) {
+                $q->where('id', '=', $id);
+            })->first()->name;
+            $title = $comment->title;
+            $content = $comment->content;
+            $created_at = $comment->created_at;
+            $json_tmp .= <<<json
+{"user": "$user", "title": "$title", "content": "$content", "created_at": "$created_at"},
+json;
+        }
+        if ($json_tmp != '')
+        {
+            $json .= mb_substr($json_tmp, 0, -1);
+        }
+        header('Content-Type: application/json; charset=utf-8');
+        echo $json . ']}';
+        exit();
+
+    } else {
+        header('Content-Type: application/json; charset=utf-8');
+        header("HTTP/1.0 404 Not Found");
+        echo '{"error": "404 - Not Found"}';
+        exit();
+    }
+})->name('api-game-id-comments');
+
+
+$app->post('/api/games/:id/comments', function ($id) {
+    $game = Game::where('id', '=', filter_var($id, FILTER_SANITIZE_STRING))->first();
+    if (isset($game->name))
+    {
+        if (isset($_POST['json']))
+        {
+            try {
+                $json = json_decode($_POST['json']);
+
+                $mess = new Message();
+                $mess->title = filter_var($json->title, FILTER_SANITIZE_STRING);
+                $mess->content = filter_var($json->content, FILTER_SANITIZE_STRING);
+                $mess->save();
+
+                $usr=User::where('email','=', $json->email)->first();
+                $usr->messages()->attach($mess);
+                $usr->save();
+
+                $game->messages()->attach($mess);
+                $game->save();
+
+                $id = $mess->id;
+                $title = $mess->title;
+                $content = $mess->content;
+
+                header('Content-Type: application/json; charset=utf-8');
+                header("HTTP/1.0 201 Create");
+                echo <<<json
+{"message": {"id": $id, "title": "$title", "content": "$content"}, "links": {"self": "/api/comments/$id"}}
+json;
+                exit();
+            } catch (Exception $e) {
+                header('Content-Type: application/json; charset=utf-8');
+                header("HTTP/1.0 400 Bad Request");
+                echo '{"error": "400 - Bad Request"}';
+                exit();
+            }
+        } else {
+            header('Content-Type: application/json; charset=utf-8');
+            header("HTTP/1.0 400 Bad Request");
+            echo '{"error": "400 - Bad Request"}';
+            exit();
+        }
+    } else {
+        header('Content-Type: application/json; charset=utf-8');
+        header("HTTP/1.0 404 Not Found");
+        echo '{"error": "404 - Not Found"}';
+        exit();
+    }
+})->name('api-game-id-comments');
+
+
+
+
+$app->get('/api/games/:id/characters', function ($id) {
+    $game = Game::where('id', '=', filter_var($id, FILTER_SANITIZE_STRING))->first();
+    if (isset($game->name))
+    {
+        $json = '{"characters": [';
+        $json_tmp = '';
+
+        $characters = $game->characters;
+
+        foreach ($characters as $character)
+        {
+            $id = $character->id;
+            $name = $character->name;
+            $json_tmp .= <<<json
+{"character": {"id": $id, "name": "$name"}, "links": {"self": "/api/characters/$id"}},
+json;
+        }
+        if ($json_tmp != '')
+        {
+            $json .= mb_substr($json_tmp, 0, -1);
+        }
+        header('Content-Type: application/json; charset=utf-8');
+        echo $json . ']}';
+        exit();
+
+    } else {
+        header('Content-Type: application/json; charset=utf-8');
+        header("HTTP/1.0 404 Not Found");
+        echo '{"error": "404 - Not Found"}';
+        exit();
+    }
+})->name('api-game-id-characters');
+
+
+$app->get('/api/games', function () {
+    if (isset($_GET['page']))
+    {
+        $pos = $_GET['page'] * 200;
+        if ($_GET['page'] - 1 > 0) {
+            $prev = $_GET['page'] - 1;
+        } else {
+            $prev = 0;
+        }
+        $next = $_GET['page'] + 1;
+    } else {
+        $pos = 0;
+        $prev = 0;
+        $next = 1;
+    }
+    $json = '{"games": [';
+    $json_tmp = '';
+    foreach (Game::whereBetween('id', [$pos, $pos + 200])->get() as $game)
+    {
+        $id = $game->id;
+        $name = trim(preg_replace('/\s+/', ' ', str_replace('"', '\"', $game->name)));
+        $alias = trim(preg_replace('/\s+/', ' ', str_replace('"', '\"', $game->alias)));
+        $deck = trim(preg_replace('/\s+/', ' ', str_replace('"', '\"', $game->deck)));
+        $json_tmp .= <<<json
+{"game": {"id": $id, "name": "$name", "alias": "$alias", "deck": "$deck"}, "links": {"self": "/api/games/$id"}},
+json;
+    }
+    if ($json_tmp != '')
+    {
+        $json .= mb_substr($json_tmp, 0, -1);
+    }
+    $slim = Slim::getInstance();
+    $url = $slim->urlFor('api-games') . '?page=';
+    header('Content-Type: application/json; charset=utf-8');
+    echo $json . '], "links" : {"prev": { "href": "' . $url . $prev .  '" }, "next": { "href": "' . $url . $next . '" }}}';
+    exit();
+})->name('api-games');
+
+
+
+
+
 
 $app->run();
